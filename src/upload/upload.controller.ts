@@ -1,7 +1,9 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, UseInterceptors, UploadedFile, Get, Res } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { CreateUploadDto } from './dto/create-upload.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { join } from 'node:path/posix';
+import { zip } from 'compressing';
 
 @Controller('upload')
 export class UploadController {
@@ -15,5 +17,21 @@ export class UploadController {
         return {
             data: '上传成功',
         };
+    }
+
+    @Get('download')
+    downloadFile(@Res() res: Response) {
+        const url = join(__dirname, '../images/1707313785398.jpg');
+        res.download(url);
+    }
+
+    @Get('stream')
+    async downloadFileWithStream(@Res() res: Response) {
+        const url = join(__dirname, '../images/1707313785398.jpg');
+        const tarStream = new zip.Stream();
+        await tarStream.addEntry(url);
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', 'attachment, filename=xiaodye');
+        tarStream.pipe(res);
     }
 }
