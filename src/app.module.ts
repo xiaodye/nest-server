@@ -6,7 +6,10 @@ import { ConfigModule } from './config/config.module';
 import { UploadModule } from './upload/upload.module';
 import { GuardModule } from './guard/guard.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CarModule } from './car/car.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'node:path/posix';
+import { AuthorModule } from './author/author.module';
 
 @Module({
     imports: [
@@ -26,7 +29,12 @@ import { CarModule } from './car/car.module';
             retryDelay: 500,
             autoLoadEntities: true, // 自动加载实体
         }),
-        CarModule,
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+            sortSchema: true,
+        }),
+        AuthorModule,
     ],
     controllers: [AppController],
     providers: [AppService],
