@@ -8,9 +8,20 @@ import { join } from 'node:path/posix';
 import Response from './common/response';
 import HttpFilter from './common/filter';
 // import { RoleGuard } from './guard/role/role.guard';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+    // swagger
+    const options = new DocumentBuilder()
+        .setTitle('小然的 swagger 接口文档')
+        .setDescription('接口描述')
+        .setVersion('1')
+        .build();
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('/api-docs', app, document);
+
     app.use(cors()); // 全局中间价
     app.useStaticAssets(join(__dirname, 'images'), { prefix: '/static' }); // 托管静态文件
     app.enableVersioning({
